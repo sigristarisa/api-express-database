@@ -36,11 +36,12 @@ router.post("/", async (req, res) => {
 
   const query = `INSERT INTO books
   (title, type, author, topic, publicationDate, pages)
-  VALUES('${title}', '${type}', '${author}', '${topic}', '${publicationDate}', '${pages}');`;
+  VALUES('${title}', '${type}', '${author}', '${topic}', '${publicationDate}', '${pages}')
+  returning *;`;
 
   const addNewBook = await db.query(query);
-
-  res.json({ books: addNewBook.rows });
+  console.log(addNewBook);
+  res.json({ book: addNewBook.rows[0] });
 });
 
 module.exports = router;
