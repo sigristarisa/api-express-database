@@ -21,10 +21,8 @@ router.get("/:id", async (req, res) => {
 // url: (e.g) http://localhost:3030/books?type=Fiction
 router.get("/", async (req, res) => {
   const type = req.query.type;
-  console.log("This is type: ", type);
   const query = `SELECT * FROM books WHERE type='${type}'`;
   const result = await db.query(query);
-  console.log("this is result: ", result);
   res.json({ books: result.rows });
 });
 
@@ -42,6 +40,17 @@ router.post("/", async (req, res) => {
   const addNewBook = await db.query(query);
   console.log(addNewBook);
   res.json({ book: addNewBook.rows[0] });
+});
+
+/* DELETE REQUEST */
+router.delete("/:id", async (req, res) => {
+  const id = req.params.id;
+  const sqlString = `DELETE FROM books WHERE id=${id} RETURNING *`;
+
+  const result = await db.query(sqlString);
+  console.log("what's in result: ", result);
+
+  res.json({ book: result.rows[0] });
 });
 
 module.exports = router;

@@ -23,6 +23,8 @@ router.get("/", async (req, res) => {
   const type = req.query.type;
   const microchip = req.query.microchip;
   let sqlString = "SELECT * FROM pets ";
+  let sqlLimit = "LIMIT ";
+  let sqlOffset = "OFFSET ";
 
   if (type && microchip) {
     sqlString += `WHERE type='${type}' AND microchip='${microchip}';`;
