@@ -2,9 +2,10 @@ const express = require("express");
 const router = express.Router();
 const db = require("../../db");
 
-/* GET REQUEST BY ID */
+/* GET REQUEST BY BREED AND TYPE */
 router.get("/", async (req, res) => {
-  const query = "SELECT breed FROM pets;";
+  const type = req.query.type;
+  const query = `SELECT breed FROM pets WHERE type='${type}'`;
   const result = await db.query(query);
   const allBreeds = result.rows;
 
