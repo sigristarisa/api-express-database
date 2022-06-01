@@ -3,11 +3,11 @@ const router = express.Router();
 const db = require("../../db");
 
 /* GENERAL GET REQUEST */
-router.get("/", async (req, res) => {
-  const query = "SELECT * FROM pets";
-  const result = await db.query(query);
-  res.json({ pets: result.rows });
-});
+// router.get("/", async (req, res) => {
+//   const query = "SELECT * FROM pets";
+//   const result = await db.query(query);
+//   res.json({ pets: result.rows });
+// });
 
 /* GET REQUEST BY ID */
 router.get("/:id", async (req, res) => {
@@ -19,13 +19,22 @@ router.get("/:id", async (req, res) => {
 });
 
 /* GET REQUEST BY TYPE */
-// router.get("/", async (req, res) => {
-//   const type = req.query.type;
-//   const query = `SELECT * FROM pets WHERE type='${type}'`;
-//   const result = await db.query(query);
+router.get("/", async (req, res) => {
+  const type = req.query.type;
+  const microchip = req.query.microchip;
+  let sqlString = "SELECT * FROM pets ";
 
-//   res.json({ pets: result.rows });
-// });
+  if (type && microchip) {
+    sqlString += `WHERE type='${type}' AND microchip='${microchip}';`;
+  } else if (type) {
+    sqlString += `WHERE type='${type}';`;
+  } else if (microchip) {
+    sqlString += microchip = "${microchip}";
+  }
+
+  const result = await db.query(sqlString);
+  res.json({ pets: result.rows });
+});
 
 /* POST REQUEST */
 router.post("/", async (req, res) => {
@@ -41,4 +50,5 @@ router.post("/", async (req, res) => {
 
   res.json({ pet: result.rows[0] });
 });
+
 module.exports = router;
