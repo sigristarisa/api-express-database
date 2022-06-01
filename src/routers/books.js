@@ -2,13 +2,6 @@ const express = require("express");
 const router = express.Router();
 const db = require("../../db");
 
-/* GENERAL GET REQUEST */
-// router.get("/", async (req, res) => {
-//   const query = "SELECT * FROM books;";
-//   const result = await db.query(query);
-//   res.json({ books: result.rows });
-// });
-
 /* GET REQUEST ACCORDING TO SPECIFIC ID*/
 router.get("/:id", async (req, res) => {
   const id = req.params.id;
@@ -21,7 +14,10 @@ router.get("/:id", async (req, res) => {
 // url: (e.g) http://localhost:3030/books?type=Fiction
 router.get("/", async (req, res) => {
   const type = req.query.type;
-  const query = `SELECT * FROM books WHERE type='${type}'`;
+  let query = `SELECT * FROM books `;
+
+  if (type) query += `WHERE type='${type}'`;
+
   const result = await db.query(query);
   res.json({ books: result.rows });
 });
@@ -42,13 +38,27 @@ router.post("/", async (req, res) => {
   res.json({ book: addNewBook.rows[0] });
 });
 
+/* PUT REQUEST */
+router.put("/:id", async (req, res) => {
+  const id = req.params.id;
+  const { title, type, author, topic, publicationDate } = req.body;
+  const values = [title, type, author, topic, publicationDate];
+  const sqlString = `UPDATE books
+  SET title=$1, type=$2, author=$3, topic=$4, publicationDate=$5
+  WHERE id=${id}
+  RETURNING *`;
+
+  const result = await db.query(sqlString, values);
+
+  res.json({ book: result.rows[0] });
+});
+
 /* DELETE REQUEST */
 router.delete("/:id", async (req, res) => {
   const id = req.params.id;
   const sqlString = `DELETE FROM books WHERE id=${id} RETURNING *`;
 
   const result = await db.query(sqlString);
-  console.log("what's in result: ", result);
 
   res.json({ book: result.rows[0] });
 });
