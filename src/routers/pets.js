@@ -50,7 +50,6 @@ router.post("/", async (req, res) => {
 router.put("/:id", async (req, res) => {
   const updatedData = req.body;
   const id = req.params.id;
-  // const { name, age, type, breed, microchip } = req.body;
   const values = [];
   const sqlArray = [];
   const sqlCondition = ` WHERE id=${id} RETURNING *`;
@@ -64,6 +63,7 @@ router.put("/:id", async (req, res) => {
       valueNum++;
     }
   }
+
   const sqlString = "UPDATE pets SET " + sqlArray.join(", ") + sqlCondition;
   const result = await db.query(sqlString, values);
 
@@ -78,4 +78,5 @@ router.delete("/:id", async (req, res) => {
 
   res.json({ pet: result.rows[0] });
 });
+
 module.exports = router;

@@ -40,14 +40,23 @@ router.post("/", async (req, res) => {
 
 /* PUT REQUEST */
 router.put("/:id", async (req, res) => {
+  const updatedData = req.body;
   const id = req.params.id;
-  const { title, type, author, topic, publicationDate } = req.body;
-  const values = [title, type, author, topic, publicationDate];
-  const sqlString = `UPDATE books
-  SET title=$1, type=$2, author=$3, topic=$4, publicationDate=$5
-  WHERE id=${id}
-  RETURNING *`;
+  const values = [];
+  const sqlArray = [];
+  const sqlCondition = ` WHERE id=${id} RETURNING *`;
+  let valueNum = 1;
 
+  for (const property in updatedData) {
+    const value = updatedData[property];
+    if (value) {
+      values.push(value);
+      sqlArray.push(`${property}=$${valueNum}`);
+      valueNum++;
+    }
+  }
+
+  const sqlString = "UPDATE books SET " + sqlArray.join(", ") + sqlCondition;
   const result = await db.query(sqlString, values);
 
   res.json({ book: result.rows[0] });
