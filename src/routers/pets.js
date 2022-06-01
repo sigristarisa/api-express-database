@@ -2,13 +2,6 @@ const express = require("express");
 const router = express.Router();
 const db = require("../../db");
 
-/* GENERAL GET REQUEST */
-// router.get("/", async (req, res) => {
-//   const query = "SELECT * FROM pets";
-//   const result = await db.query(query);
-//   res.json({ pets: result.rows });
-// });
-
 /* GET REQUEST BY ID */
 router.get("/:id", async (req, res) => {
   const id = req.params.id;
@@ -18,7 +11,7 @@ router.get("/:id", async (req, res) => {
   res.json({ pet: result.rows[0] });
 });
 
-/* GET REQUEST BY TYPE */
+/*  GENERAL GET REQUEST AND BY TYPE */
 router.get("/", async (req, res) => {
   const type = req.query.type;
   const microchip = req.query.microchip;
@@ -53,4 +46,28 @@ router.post("/", async (req, res) => {
   res.json({ pet: result.rows[0] });
 });
 
+/* PUT REQUEST */
+router.put("/:id", async (req, res) => {
+  const id = req.params.id;
+  const { name, age, type, breed, microchip } = req.body;
+  console.log("req.body is: ", req.body);
+  const values = [name, age, type, breed, microchip];
+  const sqlString = `UPDATE pets
+  SET name=$1, age=$2, type=$3, breed=$4, microchip=$5
+  WHERE id=${id}
+  RETURNING *`;
+
+  const result = await db.query(sqlString, values);
+
+  res.json({ pet: result.rows[0] });
+});
+
+router.delete("/:id", async (req, res) => {
+  const id = req.params.id;
+  const sqlString = `DELETE FROM pets WHERE id=${id} RETURNING *`;
+
+  const result = await db.query(sqlString);
+
+  res.json({ pet: result.rows[0] });
+});
 module.exports = router;
