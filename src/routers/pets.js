@@ -50,12 +50,38 @@ router.post("/", async (req, res) => {
 router.put("/:id", async (req, res) => {
   const id = req.params.id;
   const { name, age, type, breed, microchip } = req.body;
-  console.log("req.body is: ", req.body);
-  const values = [name, age, type, breed, microchip];
-  const sqlString = `UPDATE pets
-  SET name=$1, age=$2, type=$3, breed=$4, microchip=$5
-  WHERE id=${id}
-  RETURNING *`;
+  const values = [];
+  const sqlArray = [];
+  const sqlCondition = ` WHERE id=${id} RETURNING *`;
+  let valueNum = 1;
+
+  if (name) {
+    values.push(name);
+    sqlArray.push(`name=$${valueNum}`);
+    valueNum++;
+  }
+  if (age) {
+    values.push(age);
+    sqlArray.push(`age=$${valueNum}`);
+    valueNum++;
+  }
+  if (type) {
+    values.push(type);
+    sqlArray.push(`type=$${valueNum}`);
+    valueNum++;
+  }
+  if (breed) {
+    values.push(breed);
+    sqlArray.push(`breed=$${valueNum}`);
+    valueNum++;
+  }
+  if (microchip) {
+    values.push(microchip);
+    sqlArray.push(`microchip=$${valueNum}`);
+    valueNum++;
+  }
+
+  const sqlString = "UPDATE pets SET " + sqlArray.join(", ") + sqlCondition;
 
   const result = await db.query(sqlString, values);
 
